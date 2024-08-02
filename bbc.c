@@ -1,5 +1,7 @@
 #include <stdio.h>
-#define U64 unsigned long long
+
+typedef unsigned long long U64;
+
 enum {
 	a8, b8, c8, d8, e8, f8, g8, h8,
 	a7, b7, c7, d7, e7, f7, g7, h7,
@@ -19,6 +21,30 @@ enum { white, black };
 #define set_bit(bitboard, square) bitboard |= (1ULL << square)
 #define get_bit(bitboard, square) (bitboard & (1ULL << square))
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0);
+
+static inline int count_bits(U64 bitboard)
+{
+  int count = 0;
+
+  while (bitboard)
+  {
+    count++;
+    bitboard &= bitboard - 1;
+  }
+
+  return count;
+}
+
+static inline int get_ls1b_index(U64 bitboard)
+{
+  if (bitboard)
+  {
+    return count_bits((bitboard & -bitboard) - 1);
+  }
+  else {
+    return -1;
+  }
+}
 // print bitboard
 void print_bitboard(U64 bitboard)
 {
@@ -108,7 +134,7 @@ U64 knight_attacks[64];
 
 U64 King_attacks[64];
 
-/*
+const char *square_to_coordinates[] = {
 "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"
 "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6"
@@ -117,7 +143,8 @@ U64 King_attacks[64];
 "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3"
 "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
- */
+
+};
 
 U64 mask_pawn_attacks(int side, int square)
 {
@@ -322,10 +349,17 @@ int main()
   U64 block = 0ULL;
   set_bit(block, d7);
   set_bit(block, d2);
+  set_bit(block, d1);
   set_bit(block, b4);
   set_bit(block, g4);
+  
   print_bitboard(block);
+	
+  printf("index: %d   coordinate:%s\n", get_ls1b_index(block), square_to_coordinates[get_ls1b_index(block)]);
 
-  print_bitboard(rook_attacks_on_the_fly(d4, block));
-	return 0;
+  U64 test = 0ULL;
+  set_bit(test, get_ls1b_index(block));
+
+  print_bitboard(test);
+  return 0;
 }
