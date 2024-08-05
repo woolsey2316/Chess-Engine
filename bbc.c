@@ -127,6 +127,20 @@ const U64 not_hg_file = 4557430888798830399LL;
 
 const U64 not_ab_file = 18229723555195321596ULL;
 
+const int bishop_relevant_bits[64] = {
+  6, 5, 5, 5, 5, 5, 5, 6,
+  5, 5, 5, 5, 5, 5, 5, 5,
+  5, 5, 7, 7, 7, 7, 5, 5,
+  5, 5, 7, 9, 9, 7, 5, 5,
+  5, 5, 7, 9, 9, 7, 5, 5,
+  5, 5, 7, 7, 7, 7, 5, 5,
+  5, 5, 5, 5, 5, 5, 5, 5,
+  6, 5, 5, 5, 5, 5, 5, 6,
+};
+
+const int rook_relevant_bits[64] = {
+
+};
 // pawn attacks table [side][square]
 U64 pawn_attacks[2][64];
 
@@ -237,7 +251,6 @@ U64 mask_bishop_attacks(int square)
   for (r = tr + 1, f = tf - 1; r <= 6 && f >= 1; r++, f--){
     attacks |= (1ULL << (r * 8 + f));
   }
-    attacks |= (1ULL << (r * 8 + f));
   for (r = tr - 1, f = tf - 1; r >= 1 && f >= 1; r--, f--){
     attacks |= (1ULL << (r * 8 + f));
   }
@@ -340,26 +353,41 @@ void init_leapers_attacks()
 
 }
 
+U64 set_occupancy(int index, int bits_in_mask, U64 attack_mask)
+{
+  U64 occupancy = 0ULL;
+
+  for (int count = 0; count < bits_in_mask; count++)
+  {
+    // get LS1B index of attacks mask_bishop_attacks
+    int square = get_ls1b_index(attack_mask);
+
+    pop_bit(attack_mask, square);
+
+    if (index & (1 << count))
+    {
+      occupancy |= (1ULL << square);
+    }
+  }
+
+  return occupancy;
+}
+
 int main()
 {
   init_leapers_attacks();
-  //for (int square = 0; square < 64; square++) {
-  //  print_bitboard(bishop_atacks_on_the_fly(square, 0ULL));
-  //}
-  U64 block = 0ULL;
-  set_bit(block, d7);
-  set_bit(block, d2);
-  set_bit(block, d1);
-  set_bit(block, b4);
-  set_bit(block, g4);
-  
-  print_bitboard(block);
-	
-  printf("index: %d   coordinate:%s\n", get_ls1b_index(block), square_to_coordinates[get_ls1b_index(block)]);
 
-  U64 test = 0ULL;
-  set_bit(test, get_ls1b_index(block));
+  for (int rank = 0; rank < 8; rank++)
+  {
+    for (int file = 0; file < 8; file++)
+    {
+      int square = rank * 8 + file;
 
-  print_bitboard(test);
+      printf(" %d,", count_bits(mask_rook_attacks(square)));
+    }
+
+    printf("\n");
+  }
+
   return 0;
 }
