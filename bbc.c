@@ -139,7 +139,14 @@ const int bishop_relevant_bits[64] = {
 };
 
 const int rook_relevant_bits[64] = {
-
+  12, 11, 11, 11, 11, 11, 11, 12,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  11, 10, 10, 10, 10, 10, 10, 11,
+  12, 11, 11, 11, 11, 11, 11, 12,
 };
 // pawn attacks table [side][square]
 U64 pawn_attacks[2][64];
@@ -373,21 +380,30 @@ U64 set_occupancy(int index, int bits_in_mask, U64 attack_mask)
   return occupancy;
 }
 
+unsigned int state = 1804289383;
+
+unsigned int get_random_number() 
+{
+  
+  unsigned int number = state;
+
+  number ^= number << 13;
+  number ^= number >> 17;
+  number ^= number << 5;
+
+  state = number;
+
+  return number;
+}
+
+
 int main()
 {
   init_leapers_attacks();
 
-  for (int rank = 0; rank < 8; rank++)
-  {
-    for (int file = 0; file < 8; file++)
-    {
-      int square = rank * 8 + file;
-
-      printf(" %d,", count_bits(mask_rook_attacks(square)));
-    }
-
-    printf("\n");
-  }
-
+  printf("%ud\n", get_random_number());
+  printf("%ud\n", get_random_number());
+  printf("%ud\n", get_random_number());
+  printf("%ud\n", get_random_number());
   return 0;
 }
