@@ -27,15 +27,18 @@ enum {
     a4, b4, c4, d4, e4, f4, g4, h4,
     a3, b3, c3, d3, e3, f3, g3, h3,
     a2, b2, c2, d2, e2, f2, g2, h2,
-    a1, b1, c1, d1, e1, f1, g1, h1
+    a1, b1, c1, d1, e1, f1, g1, h1, no_sq
 };
 
 // sides to move (colors)
-enum { white, black };
+enum { white, black, both };
 
 // bishop and rook
 enum { rook, bishop };
 
+enum { wk = 1, wq = 2, bk = 4, bq = 8};
+
+enum = { P, N, B, R, Q, K, p, n, b, r, q, k };
 // convert squares to coordinates
 const char *square_to_coordinates[] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
@@ -47,6 +50,37 @@ const char *square_to_coordinates[] = {
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 };
+
+char ascii_pieces[12] = "PNBRQKpnbrqk";
+
+char *unicode_pieces[12] = {"♙","♘","♗","♖","♕","♔","♟","♞","♝","♜","♛","♚"};
+
+int char_pieces[] = {
+  ['P'] = P,
+  ['N'] = N,
+  ['B'] = B,
+  ['R'] = R,
+  ['Q'] = Q,
+  ['K'] = K,
+  ['p'] = p,
+  ['n'] = n,
+  ['b'] = b,
+  ['r'] = r,
+  ['q'] = q,
+  ['k'] = k;
+}
+
+  
+
+U64 bitboards[12];
+
+U64 occupanices[3];
+
+int side = -1;
+
+int enpassant = no_sq;
+
+int castle;
 
 
 /**********************************\
@@ -110,9 +144,9 @@ U64 generate_magic_number()
 \**********************************/
 
 // set/get/pop bit macros
-#define set_bit(bitboard, square) (bitboard |= (1ULL << square))
-#define get_bit(bitboard, square) (bitboard & (1ULL << square))
-#define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
+#define set_bit(bitboard, square) ((bitboard) |= (1ULL << (square)))
+#define get_bit(bitboard, square) ((bitboard) & (1ULL << (square))
+#define pop_bit(bitboard, square) ((bitboard) &= -(1ULL << (square)))
 
 // count bits within a bitboard (Brian Kernighan's way)
 static inline int count_bits(U64 bitboard)
