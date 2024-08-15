@@ -1203,6 +1203,30 @@ static inline U64 get_rook_attacks(int square, U64 occupancy)
     return rook_attacks[square][occupancy];
 }
 
+static inline U64 get_queen_attacks(int square, U64 occupancy)
+{
+  U64 queen_attacks = 0ULL;
+
+  U64 bishop_occupancy = occupancy;
+
+  U64 rook_occupancy = occupancy;
+
+  bishop_occupancy &= bishop_masks[square];
+  bishop_occupancy *= bishop_magic_numbers[square];
+  bishop_occupancy >>= 64 - bishop_relevant_bits[square];
+
+  queen_attacks = bishop_attacks[square][bishop_occupancy];
+
+
+  // get bishop attacks assuming current board occupancy
+  rook_occupancy &= rook_masks[square];
+  rook_occupancy *= rook_magic_numbers[square];
+  rook_occupancy >>= 64 - rook_relevant_bits[square];
+
+  queen_attacks |= rook_attacks[square][rook_occupancy];
+  // return rook attacks
+  return queen_attacks;
+}
 
 /**********************************\
  ==================================
@@ -1239,36 +1263,8 @@ int main()
     // init all
     init_all();
 
+    U64 occupancy = 0ULL;
 
-    // parse fen
-    parse_fen("r2q1rk1/ppp2ppp/2n1bn2/2b1p3/3pP3/3P1NPP/PPP1NPB1/R1BQ1RK1 w q a3 0 9 ");
-    
-    // print chess board
-    print_board();
-
-    
-    // parse fen
-    parse_fen(start_position);
-    
-    // print chess board
-    print_board();
-    
-    
-    // parse fen
-    parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b Kk e6 0 1 ");
-    
-    // print chess board
-    print_board();
-
-    
-    // print black occupancies
-    print_bitboard(occupancies[black]);
-    
-    // print white occupancies
-    print_bitboard(occupancies[white]);
-    
-    // print all occupancies
-    print_bitboard(occupancies[both]);
-    
+    print_bitboard(get_queen_attacks(d4, occupancy));
     return 0;
 }
